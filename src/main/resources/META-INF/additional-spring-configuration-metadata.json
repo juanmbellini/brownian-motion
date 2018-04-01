@@ -1,0 +1,19 @@
+{
+  "properties": [
+    {
+      "name": "custom.system.particles",
+      "type": "java.lang.Integer",
+      "description": "The amount of particles in the space (i.e The N value)."
+    },
+    {
+      "name": "custom.output.raw",
+      "type": "java.lang.String",
+      "description": "The path for the raw file."
+    },
+    {
+      "name": "custom.output.ovito",
+      "type": "java.lang.String",
+      "description": "The path for the Ovito file."
+    }
+  ]
+}
