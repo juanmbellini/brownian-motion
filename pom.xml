@@ -24,6 +24,13 @@
         <bootstrapClass>ar.edu.itba.ss.brownian_motion.Main</bootstrapClass>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -32,6 +39,11 @@
                 <version>${org.springframework.boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.github.juanmbellini</groupId>
+                <artifactId>simulation-engine</artifactId>
+                <version>0.0.1-RELEASE</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -45,6 +57,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.github.juanmbellini</groupId>
+            <artifactId>simulation-engine</artifactId>
         </dependency>
     </dependencies>
 
