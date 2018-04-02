@@ -7,7 +7,13 @@ spring:
         banner-mode: "off"
 custom:
     system:
-        particles: 1000
+        wall-length: 0.5
+        particles-amount: 100
+        small-particles-radius: 0.005
+        small-particles-mass: 0.0001
+        big-particle-mass: 0.1
+        big-particle-radius: 0.05
+
 
 ---
 # Configuration for Development Environment
