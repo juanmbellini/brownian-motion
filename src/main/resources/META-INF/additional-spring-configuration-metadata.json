@@ -1,9 +1,44 @@
 {
   "properties": [
     {
-      "name": "custom.system.particles",
+      "name": "custom.system.wall-length",
+      "type": "java.lang.Double",
+      "description": "The length of the room (in meters)."
+    },
+    {
+      "name": "custom.system.particles-amount",
       "type": "java.lang.Integer",
-      "description": "The amount of particles in the space (i.e The N value)."
+      "description": "The amount of small particles in the space (i.e The N value)."
+    },
+    {
+      "name": "custom.system.small-particles-radius",
+      "type": "java.lang.Double",
+      "description": "The radius of the small particles (in meters)."
+    },
+    {
+      "name": "custom.system.small-particles-mass",
+      "type": "java.lang.Double",
+      "description": "The mass of the small particles (in kilograms)."
+    },
+    {
+      "name": "custom.system.big-particle-radius",
+      "type": "java.lang.Double",
+      "description": "The radius of the big particle (in meters)."
+    },
+    {
+      "name": "custom.system.big-particle-mass",
+      "type": "java.lang.Double",
+      "description": "The mass of the big particle (in kilograms)."
+    },
+    {
+      "name": "custom.simulation.duration",
+      "type": "java.lang.Double",
+      "description": "The duration of the simulation (in seconds)."
+    },
+    {
+      "name": "custom.simulation.output-interval",
+      "type": "java.lang.Double",
+      "description": "The duration of the output interval (i.e dt2) (in seconds)."
     },
     {
       "name": "custom.output.raw",

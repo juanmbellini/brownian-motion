@@ -19,9 +19,12 @@
 
         <!-- Dependencies versions  -->
         <org.springframework.boot.version>1.5.10.RELEASE</org.springframework.boot.version>
+        <com.github.juanmbellini.sim-engine.version>0.0.3-RELEASE</com.github.juanmbellini.sim-engine.version>
+        <org.apache.commons.commons-math3.version>3.6.1</org.apache.commons.commons-math3.version>
+
 
         <!-- Execution properties -->
-        <bootstrapClass>ar.edu.itba.ss.brownian_motion.Main</bootstrapClass>
+        <bootstrapClass>ar.edu.itba.ss.brownian_motion.BrownMotion</bootstrapClass>
     </properties>
 
     <repositories>
@@ -43,7 +46,12 @@
             <dependency>
                 <groupId>com.github.juanmbellini</groupId>
                 <artifactId>simulation-engine</artifactId>
-                <version>0.0.1-RELEASE</version>
+                <version>${com.github.juanmbellini.sim-engine.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-math3</artifactId>
+                <version>${org.apache.commons.commons-math3.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -61,6 +69,10 @@
         <dependency>
             <groupId>com.github.juanmbellini</groupId>
             <artifactId>simulation-engine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
         </dependency>
     </dependencies>
 
