@@ -22,12 +22,24 @@ public class BrownMotion implements CommandLineRunner {
      */
     private final static Logger LOGGER = LoggerFactory.getLogger(BrownMotion.class);
 
+    /**
+     * The system to be simulated.
+     */
     private final BrownSystem brownSystem;
 
+    /**
+     * The simulation engine.
+     */
     private final EventDrivenSimulationEngine<BrownSystem.BrownSystemState> engine;
 
+    /**
+     * The duration of the simulation.
+     */
     private final double duration;
 
+    /**
+     * The {@link DataSaver} that will output data for ovito.
+     */
     private final DataSaver<BrownSystem.BrownSystemState> ovitoFileSaver;
 
     @Autowired
