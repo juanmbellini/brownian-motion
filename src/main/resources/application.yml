@@ -8,9 +8,8 @@ spring:
 custom:
     system:
         wall-length: 0.5
-        particles-amount: 100
         small-particles-radius: 0.005
-        small-particles-mass: 0.0001
+        small-particles-mass: 0.001
         big-particle-mass: 0.1
         big-particle-radius: 0.05
 

@@ -28,8 +28,6 @@ public class OvitoFileSaverImpl extends OvitoFileSaver<BrownSystem.BrownSystemSt
 
         final Stream<StringBuilder> particles = state.getParticleStates().stream()
                 .map(particle -> new StringBuilder()
-                        .append(particle.getRadius())
-                        .append(" ")
                         .append(particle.getPosition().getX())
                         .append(" ")
                         .append(particle.getPosition().getY())
@@ -37,11 +35,11 @@ public class OvitoFileSaverImpl extends OvitoFileSaver<BrownSystem.BrownSystemSt
                         .append(particle.getVelocity().getX())
                         .append(" ")
                         .append(particle.getVelocity().getY())
+                        .append(" ")
+                        .append(particle.getRadius())
                 );
         final Stream<StringBuilder> walls = state.getWallStates().stream()
                 .map(wall -> new StringBuilder()
-                        .append(0.0001)
-                        .append(" ")
                         .append(wall.getInitialPoint().getX())
                         .append(" ")
                         .append(wall.getInitialPoint().getY())
@@ -50,6 +48,7 @@ public class OvitoFileSaverImpl extends OvitoFileSaver<BrownSystem.BrownSystemSt
                         .append(" ")
                         .append(0.0)
                         .append(" ")
+                        .append(0.0001)
                 );
 
         final List<String> finalList = Stream.concat(particles, walls)
