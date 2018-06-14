@@ -17,7 +17,7 @@ public class TwoParticlesCollisionEvent extends CollisionEvent<Particle> {
      * @param collided     The {@link Particle} being collided.
      * @param eventInstant The instant at which this event happens.
      */
-    public TwoParticlesCollisionEvent(Particle collider, Particle collided, double eventInstant) {
+    public TwoParticlesCollisionEvent(final Particle collider, final Particle collided, final double eventInstant) {
         super(collider, collided, eventInstant);
         this.collidedCollisionsAmount = collided.getCollisionsAmount();
     }

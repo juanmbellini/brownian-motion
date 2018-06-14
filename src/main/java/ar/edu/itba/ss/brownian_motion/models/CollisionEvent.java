@@ -32,7 +32,7 @@ public abstract class CollisionEvent<C extends Collisionable> implements Compara
      * @param collided     The {@link Collisionable} being collided.
      * @param eventInstant The instant at which this event happens.
      */
-    public CollisionEvent(Particle collider, C collided, double eventInstant) {
+    public CollisionEvent(final Particle collider, final C collided, final double eventInstant) {
         this.collider = collider;
         this.collided = collided;
         this.collidedCollisionsAmount = collider.getCollisionsAmount();
@@ -86,7 +86,7 @@ public abstract class CollisionEvent<C extends Collisionable> implements Compara
 
 
     @Override
-    public int compareTo(CollisionEvent<C> o) {
+    public int compareTo(final CollisionEvent<C> o) {
         return Double.compare(this.eventInstant, o.eventInstant);
     }
 }

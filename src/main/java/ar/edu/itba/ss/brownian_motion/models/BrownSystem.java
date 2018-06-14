@@ -1,12 +1,11 @@
 package ar.edu.itba.ss.brownian_motion.models;
 
+import ar.edu.itba.ss.brownian_motion.utils.ComponentsProvider;
 import ar.edu.itba.ss.g7.engine.simulation.State;
-import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -16,40 +15,30 @@ import java.util.stream.Stream;
  */
 public class BrownSystem implements EventDrivenSystem<BrownSystem.BrownSystemState> {
 
+    // ================================================================================================================
+    // System stuff
+    // ================================================================================================================
+
     /**
-     * The particles in this system.
+     * The {@link Particle}s in this system.
      */
     private final List<Particle> particles;
 
     /**
-     * List holding the walls of the system.
+     * {@link List} holding the walls of the system.
      */
     private final List<Wall> walls;
 
     /**
-     * The length of te room's side.
+     * The big particle (not final as the {@link #restart()} method can rebuild it).
+     * This {@link Particle} is saved because its trajectory must be taken into account.
      */
-    private final double length;
+    private Particle bigParticle;
 
-    /**
-     * The amount of small particles in the system.
-     */
-    private final int amountOfSmallParticles;
 
-    /**
-     * The radius of the small particles.
-     */
-    private final double smallParticlesRadius;
-
-    /**
-     * The mass of the small particles.
-     */
-    private final double smallParticlesMass;
-
-    /**
-     * The big particle.
-     */
-    private final Particle bigParticle;
+    // ================================================================================================================
+    // Update stuff
+    // ================================================================================================================
 
     /**
      * Last moment at which this system was updated.
@@ -57,44 +46,52 @@ public class BrownSystem implements EventDrivenSystem<BrownSystem.BrownSystemSta
     private double lastUpdated;
 
 
+    // ================================================================================================================
+    // Initialization stuff
+    // ================================================================================================================
+
+    /**
+     * A {@link ComponentsProvider} that aids the task of building the system.
+     */
+    private final ComponentsProvider componentsProvider;
+
+
+    // ================================================================================================================
+    // Constructor
+    // ================================================================================================================
+
     /**
      * Constructor.
      *
      * @param length                 The length of te room's side.
-     * @param amountOfSmallParticles The amount of small particles in the system.
-     * @param smallParticlesRadius   The radius of the small particles.
+     * @param bigParticleMass        The mass of the big particle.
+     * @param bigParticleRadius      The radius of the big particle.
      * @param smallParticlesMass     The mass of the small particles.
-     * @param bigParticlesRadius     The radius of the big particle.
-     * @param bigParticlesMass       The mass of the big particle.
+     * @param smallParticlesRadius   The radius of the small particles.
+     * @param amountOfSmallParticles The amount of small particles in the system.
      */
-    public BrownSystem(double length, int amountOfSmallParticles,
-                       double smallParticlesRadius, double smallParticlesMass,
-                       double bigParticlesRadius, double bigParticlesMass) {
-        this.particles = new LinkedList<>();
+    public BrownSystem(final double length,
+                       final double bigParticleMass, final double bigParticleRadius,
+                       final double smallParticlesMass, final double smallParticlesRadius,
+                       final int amountOfSmallParticles) {
+
+        this.componentsProvider = new ComponentsProvider(length, bigParticleMass, bigParticleRadius,
+                smallParticlesMass, smallParticlesRadius, amountOfSmallParticles);
+
+        this.walls = componentsProvider.buildRoom();
+        final ComponentsProvider.ParticlesHolder holder = componentsProvider.createParticles();
+        this.particles = holder.getParticles();
+        this.bigParticle = holder.getBigParticle();
         this.lastUpdated = 0;
-
-        this.length = length;
-        final Wall leftWall = Wall.getVertical(0, 0, length);
-        final Wall bottomWall = Wall.getHorizontal(0, 0, length);
-        final Vector2D rightInitialPoint = bottomWall.getFinalPoint();
-        final Vector2D topInitialPoint = leftWall.getFinalPoint();
-        final Wall rightWall = Wall.getVertical(rightInitialPoint.getX(), rightInitialPoint.getY(), length);
-        final Wall topWall = Wall.getHorizontal(topInitialPoint.getX(), topInitialPoint.getY(), length);
-        this.walls = Stream.of(leftWall, bottomWall, rightWall, topWall).collect(Collectors.toList());
-
-        this.amountOfSmallParticles = amountOfSmallParticles;
-        this.smallParticlesRadius = smallParticlesRadius;
-        this.smallParticlesMass = smallParticlesMass;
-        Optional<Particle> bigParticle;
-        do {
-            bigParticle = provideParticle(bigParticlesMass, bigParticlesRadius, length, 0.0, 0.0, this.walls);
-        } while (!bigParticle.isPresent());
-        this.bigParticle = bigParticle.get();
-
     }
 
+
+    // ================================================================================================================
+    // Interface stuff
+    // ================================================================================================================
+
     @Override
-    public void update(double instant) {
+    public void update(final double instant) {
         if (Double.compare(instant, lastUpdated) <= 0) {
             return;
         }
@@ -102,36 +99,17 @@ public class BrownSystem implements EventDrivenSystem<BrownSystem.BrownSystemSta
         lastUpdated = instant;
     }
 
-    private Optional<Particle> provideParticle(double mass, double radius, double length,
-                                               double xVelocity, double yVelocity,
-                                               List<Wall> walls) {
-        final double xPosition = radius + new Random().nextDouble() * (length - 2 * radius);
-        final double yPosition = radius + new Random().nextDouble() * (length - 2 * radius);
-        return Optional.of(new Particle(mass, radius, xPosition, yPosition, xVelocity, yVelocity))
-                .filter(particle -> walls.stream().filter(wall -> this.isOverlapped(particle, wall)).count() == 0);
-
-    }
-
     @Override
     public void restart() {
         this.particles.clear();
+        final ComponentsProvider.ParticlesHolder holder = componentsProvider.createParticles();
+        this.bigParticle = holder.getBigParticle();
+        this.particles.addAll(holder.getParticles());
         this.lastUpdated = 0;
-        this.particles.add(bigParticle);
-        while (particles.size() < amountOfSmallParticles + 1) {
-            final Optional<Particle> newParticle = provideParticle(smallParticlesMass, smallParticlesRadius, length,
-                    -0.1 + new Random().nextDouble() * 0.2,
-                    -0.1 + new Random().nextDouble() * 0.2,
-                    walls);
-            newParticle.ifPresent(particle -> {
-                if (particles.stream().filter(others -> this.isOverlapped(particle, others)).count() == 0) {
-                    particles.add(particle);
-                }
-            });
-        }
     }
 
     @Override
-    public List<CollisionEvent<? extends Collisionable>> nextCollisions(double now) {
+    public List<CollisionEvent<? extends Collisionable>> nextCollisions(final double now) {
         final List<Collisionable> collisionableList = Stream.concat(particles.stream(), walls.stream())
                 .collect(Collectors.toList());
         return particles.stream()
@@ -154,6 +132,37 @@ public class BrownSystem implements EventDrivenSystem<BrownSystem.BrownSystemSta
         return new BrownSystemState(this);
     }
 
+
+    // ================================================================================================================
+    // Getters
+    // ================================================================================================================
+
+    /**
+     * @return The particles in this system.
+     */
+    /* package */ List<Particle> getParticles() {
+        return new LinkedList<>(particles);
+    }
+
+    /**
+     * @return {@link List} holding the walls of the system.
+     */
+    /* package */ List<Wall> getWalls() {
+        return new LinkedList<>(walls);
+    }
+
+    /**
+     * @return The big particle.
+     */
+    /* package */ Particle getBigParticle() {
+        return bigParticle;
+    }
+
+
+    // ================================================================================================================
+    // Helpers
+    // ================================================================================================================
+
     /**
      * Transforms the given params to {@link CollisionEvent}.
      *
@@ -162,9 +171,9 @@ public class BrownSystem implements EventDrivenSystem<BrownSystem.BrownSystemSta
      * @param time     The instant at which the event is happening.
      * @return The created {@link CollisionEvent}.
      */
-    private static CollisionEvent<? extends Collisionable> getCollisionEvent(Particle collider,
-                                                                             Collisionable collided,
-                                                                             double time) {
+    private static CollisionEvent<? extends Collisionable> getCollisionEvent(final Particle collider,
+                                                                             final Collisionable collided,
+                                                                             final double time) {
 
         if (collided instanceof Particle) {
             return new TwoParticlesCollisionEvent(collider, (Particle) collided, time);
@@ -176,48 +185,15 @@ public class BrownSystem implements EventDrivenSystem<BrownSystem.BrownSystemSta
     }
 
 
-    /**
-     * Indicates if the given {@code particle} overlaps with the given {@code other} particle.
-     *
-     * @param particle One particle.
-     * @param other    The other particle.
-     * @return {@code true} if they overlap, or {@code false} otherwise.
-     */
-    public boolean isOverlapped(Particle particle, Particle other) {
-        return particle.getPosition().distance(other.getPosition()) <= particle.getRadius() + other.getRadius();
-    }
-
-    /**
-     * Indicates if the given {@code particle} overlaps with the given {@code wall}.
-     *
-     * @param particle The particle.
-     * @param wall     The wall.
-     * @return {@code true} if they overlap, or {@code false} otherwise.
-     * @implNote Uses Heron's formula.
-     */
-    public boolean isOverlapped(Particle particle, Wall wall) {
-        // The wall's points and the particle's positions makes up a triangle.
-        // We must find the distance between the particle's position and the wall,
-        // which is the same as getting the triangle's height (if the wall is the base).
-        // We use Heron's formula
-        final double base = wall.getInitialPoint().distance(wall.getFinalPoint());
-        final double triangleSide1 = wall.getInitialPoint().distance(particle.getPosition());
-        final double triangleSide2 = wall.getFinalPoint().distance(particle.getPosition());
-        final double s = (base + triangleSide1 + triangleSide2) / 2;
-        final double distance = Math.sqrt(s * (s - base) * (s - triangleSide1) * (s - triangleSide2)) * 2 / base;
-
-        return distance <= particle.getRadius();
-    }
+    // ================================================================================================================
+    // State
+    // ================================================================================================================
 
     /**
      * {@link State} for a {@link BrownSystem}.
      */
     public final static class BrownSystemState implements State {
 
-        /**
-         * The room's length.
-         */
-        private final double length;
         /**
          * The {@link Particle}s' states.
          */
@@ -228,21 +204,24 @@ public class BrownSystem implements EventDrivenSystem<BrownSystem.BrownSystemSta
         private final List<Wall.WallState> wallStates;
 
         /**
+         * The big {@link Particle}'s state.
+         */
+        private final Particle.ParticleState bigParticleState;
+
+
+        /**
          * Constructors
          *
          * @param brownSystem The {@link BrownSystem} owning this state.
          */
-        public BrownSystemState(BrownSystem brownSystem) {
-            this.length = brownSystem.length;
-            this.particleStates = brownSystem.particles.stream().map(Particle::outputState).collect(Collectors.toList());
-            this.wallStates = brownSystem.walls.stream().map(Wall::outputState).collect(Collectors.toList());
-        }
-
-        /**
-         * @return The room's length.
-         */
-        public double getLength() {
-            return length;
+        /* package */ BrownSystemState(final BrownSystem brownSystem) {
+            this.particleStates = brownSystem.getParticles().stream()
+                    .map(Particle::outputState)
+                    .collect(Collectors.toList());
+            this.wallStates = brownSystem.getWalls().stream()
+                    .map(Wall::outputState)
+                    .collect(Collectors.toList());
+            this.bigParticleState = brownSystem.getBigParticle().outputState();
         }
 
         /**
@@ -258,6 +237,12 @@ public class BrownSystem implements EventDrivenSystem<BrownSystem.BrownSystemSta
         public List<Wall.WallState> getWallStates() {
             return wallStates;
         }
-    }
 
+        /**
+         * @return The big {@link Particle}'s state.
+         */
+        public Particle.ParticleState getBigParticleState() {
+            return bigParticleState;
+        }
+    }
 }

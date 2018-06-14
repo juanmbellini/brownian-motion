@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * Defines behaviour for an object that can act like a system that is event driven
- * (i.e is updatable up to a given {@link Instant}).
+ * (i.e is updatable up to a given moment where an interesting event happens).
  */
 public interface EventDrivenSystem<S extends State> extends StateHolder<S> {
 
@@ -17,7 +17,7 @@ public interface EventDrivenSystem<S extends State> extends StateHolder<S> {
      *
      * @param instant instant to which the system will be taken.
      */
-    void update(double instant);
+    void update(final double instant);
 
     /**
      * Restarts the system.
@@ -29,5 +29,5 @@ public interface EventDrivenSystem<S extends State> extends StateHolder<S> {
      *
      * @return The {@link List} of {@link CollisionEvent}s that will happen in the future.
      */
-    List<CollisionEvent<? extends Collisionable>> nextCollisions(double now);
+    List<CollisionEvent<? extends Collisionable>> nextCollisions(final double now);
 }

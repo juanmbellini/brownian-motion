@@ -4,6 +4,7 @@ import ar.edu.itba.ss.brownian_motion.models.CollisionEvent;
 import ar.edu.itba.ss.brownian_motion.models.Collisionable;
 import ar.edu.itba.ss.brownian_motion.models.EventDrivenSystem;
 import ar.edu.itba.ss.g7.engine.simulation.State;
+import org.springframework.util.Assert;
 
 import java.util.*;
 
@@ -11,7 +12,7 @@ import java.util.*;
  * An event driven simulation engine.
  * This engine performs simulations using the event driven approach.
  * Intervals between simulation steps are variable,
- * being these the moments at which something interesting is happening the system.
+ * being these the moments at which something interesting is happening in the system.
  */
 public class EventDrivenSimulationEngine<S extends State> {
 
@@ -21,10 +22,10 @@ public class EventDrivenSimulationEngine<S extends State> {
     private final EventDrivenSystem<S> system;
 
     /**
-     * Holds the outputted animation frames through which the system passes
+     * Holds the outputted states through which the system passes
      * (i.e those that are outputted every dt2 interval)
      */
-    private final Queue<S> animationFrames;
+    private final Queue<S> states;
 
     /**
      * {@link Queue} that contains the events to be processed by the engine.
@@ -37,8 +38,8 @@ public class EventDrivenSimulationEngine<S extends State> {
     private boolean initialized;
 
     /**
-     * Indicates the interval of time between two animation frames outputs
-     * (i.e amount of time between that must elapse between call to the {@link #saveAnimationFrame()} method,
+     * Indicates the interval of time between two outputted states
+     * (i.e amount of time between that must elapse between call to the {@link #saveState()} method,
      * also known as dt2).
      */
     private final double dt2;
@@ -53,10 +54,10 @@ public class EventDrivenSimulationEngine<S extends State> {
      * @param system The system to which the simulation will be performed.
      * @param dt2    Indicates the interval of time between two animation frames outputs (i.e also known as dt2).
      */
-    public EventDrivenSimulationEngine(EventDrivenSystem<S> system, double dt2) {
+    public EventDrivenSimulationEngine(final EventDrivenSystem<S> system, final double dt2) {
         this.system = system;
         this.dt2 = dt2;
-        this.animationFrames = new LinkedList<>();
+        this.states = new LinkedList<>();
         this.events = new PriorityQueue<>();
         this.initialized = false;
         this.eventFrequencies = new LinkedList<>();
@@ -85,19 +86,20 @@ public class EventDrivenSimulationEngine<S extends State> {
         while (now < finishingInstant) {
             events.addAll(system.nextCollisions(now));
             final Optional<CollisionEvent<? extends Collisionable>> eventOptional = processEventsQueue();
-            if (!eventOptional.isPresent()) {
-                // This should not happen, but just in case...
-                throw new IllegalStateException("No more valid events before end of simulation");
-            }
+
+            // This should not happen, but just in case...
+            Assert.state(eventOptional.isPresent(), "No more valid events before end of simulation");
+
             final CollisionEvent<? extends Collisionable> event = eventOptional.get();
             final double eventInstant = event.getEventInstant();
             double nextOutputInstant = outputInstant + dt2;
+
             // In case the event happens after the next output instant, evolve system at an outputInterval rate.
             while (nextOutputInstant < eventInstant) {
                 outputInstant = nextOutputInstant;
                 system.update(nextOutputInstant);
-                saveAnimationFrame();
-                nextOutputInstant = nextOutputInstant +  dt2;
+                saveState();
+                nextOutputInstant = nextOutputInstant + dt2;
 
                 // TODO: move to another method
                 final int lastFrequency = eventFrequencies.stream().reduce(0, (o1, o2) -> o1 + o2);
@@ -115,8 +117,8 @@ public class EventDrivenSimulationEngine<S extends State> {
      *
      * @return The simulation results.
      */
-    public Queue<S> getAnimationFrames() {
-        return new LinkedList<>(animationFrames); // Copy queue to avoid change of state from outside.
+    public Queue<S> getStates() {
+        return new LinkedList<>(states); // Copy queue to avoid change of state from outside.
     }
 
     /**
@@ -126,12 +128,12 @@ public class EventDrivenSimulationEngine<S extends State> {
      * @throws IllegalStateException In case this engine is now simulating.
      */
     public void clear() throws IllegalStateException {
-        this.animationFrames.clear();
+        this.states.clear();
         this.events.clear();
         this.system.restart();
         this.eventFrequencies.clear();
         this.processedEvents.clear();
-        saveAnimationFrame();
+        saveState();
     }
 
     /**
@@ -153,10 +155,10 @@ public class EventDrivenSimulationEngine<S extends State> {
 
 
     /**
-     * Saves the actual state in the {@code animationFrames} {@link Queue}.
+     * Saves the actual state in the {@code states} {@link Queue}.
      */
-    private void saveAnimationFrame() {
-        this.animationFrames.offer(this.system.outputState());
+    private void saveState() {
+        this.states.offer(this.system.outputState());
     }
 
 

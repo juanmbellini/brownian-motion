@@ -12,7 +12,7 @@ public class ParticleAndWallCollisionEvent extends CollisionEvent<Wall> {
      * @param collided     The {@link Wall} being collided.
      * @param eventInstant The instant at which this event happens.
      */
-    public ParticleAndWallCollisionEvent(Particle collider, Wall collided, double eventInstant) {
+    public ParticleAndWallCollisionEvent(final Particle collider, final Wall collided, final double eventInstant) {
         super(collider, collided, eventInstant);
     }
 

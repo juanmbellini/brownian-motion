@@ -33,7 +33,7 @@ public class Wall implements Collisionable, StateHolder<Wall.WallState> {
      * @param initialPoint The wall's initial position.
      * @param finalPoint   The wall's final position.
      */
-    private Wall(Vector2D initialPoint, Vector2D finalPoint, WallLayout wallLayout) {
+    private Wall(final Vector2D initialPoint, final Vector2D finalPoint, final WallLayout wallLayout) {
         this.initialPoint = initialPoint;
         this.finalPoint = finalPoint;
         this.wallLayout = wallLayout;
@@ -55,7 +55,7 @@ public class Wall implements Collisionable, StateHolder<Wall.WallState> {
     }
 
     @Override
-    public Optional<Double> getCollisionTime(Particle particle) {
+    public Optional<Double> getCollisionTime(final Particle particle) {
         switch (wallLayout) {
             case HORIZONTAL: {
                 final double yVelocity = particle.getVelocity().getY();
@@ -93,25 +93,25 @@ public class Wall implements Collisionable, StateHolder<Wall.WallState> {
             }
             case OTHER:
             default:
-                throw new RuntimeException("Only horizontal or vertical"); // TODO: define better exception?
+                throw new RuntimeException("Only horizontal or vertical");
         }
     }
 
 
     @Override
-    public void collide(Particle particle) {
+    public void collide(final Particle particle) {
         final Vector2D velocity = particle.getVelocity();
         particle.addCollision();
         switch (wallLayout) {
             case HORIZONTAL:
-                particle.setVelocity(velocity.getX(), -velocity.getY());
+                particle.setVelocity(new Vector2D(velocity.getX(), -velocity.getY()));
                 break;
             case VERTICAL:
-                particle.setVelocity(-velocity.getX(), velocity.getY());
+                particle.setVelocity(new Vector2D(-velocity.getX(), velocity.getY()));
                 break;
             case OTHER:
             default:
-                throw new RuntimeException("Only horizontal or vertical"); // TODO: define better exception?
+                throw new RuntimeException("Only horizontal or vertical");
         }
     }
 
@@ -129,7 +129,7 @@ public class Wall implements Collisionable, StateHolder<Wall.WallState> {
      * @return The created wall.
      * @throws IllegalArgumentException In case the length is not positive.
      */
-    public static Wall getHorizontal(double xInitialPosition, double yInitialPosition, double length)
+    public static Wall getHorizontal(final double xInitialPosition, final double yInitialPosition, final double length)
             throws IllegalArgumentException {
         validateLength(length);
         final Vector2D initialPosition = new Vector2D(xInitialPosition, yInitialPosition);
@@ -146,7 +146,7 @@ public class Wall implements Collisionable, StateHolder<Wall.WallState> {
      * @return The created wall.
      * @throws IllegalArgumentException In case the length is not positive.
      */
-    public static Wall getVertical(double xInitialPosition, double yInitialPosition, double length)
+    public static Wall getVertical(final double xInitialPosition, final double yInitialPosition, final double length)
             throws IllegalArgumentException {
         validateLength(length);
         final Vector2D initialPosition = new Vector2D(xInitialPosition, yInitialPosition);
@@ -160,7 +160,7 @@ public class Wall implements Collisionable, StateHolder<Wall.WallState> {
      * @param length The length value to be validated.
      * @throws IllegalArgumentException In case the value is not valid (i.e is not positive).
      */
-    private static void validateLength(double length) throws IllegalArgumentException {
+    private static void validateLength(final double length) throws IllegalArgumentException {
         Assert.isTrue(length > 0, "The length of the wall must be positive");
     }
 
@@ -200,7 +200,7 @@ public class Wall implements Collisionable, StateHolder<Wall.WallState> {
          *
          * @param wall The {@link Wall} owning this state.
          */
-        private WallState(Wall wall) {
+        private WallState(final Wall wall) {
             this.initialPoint = wall.initialPoint;
             this.finalPoint = wall.finalPoint;
         }

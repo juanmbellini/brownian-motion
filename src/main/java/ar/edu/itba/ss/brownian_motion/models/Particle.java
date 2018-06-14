@@ -40,19 +40,16 @@ public class Particle implements Collisionable, StateHolder<Particle.ParticleSta
     /**
      * Constructor.
      *
-     * @param mass      The particle's mass.
-     * @param radius    The particle's radius.
-     * @param xPosition The particle's 'x' component of the position.
-     * @param yPosition The particle's 'y' component of the position.
-     * @param xVelocity The particle's 'x' component of the velocity.
-     * @param yVelocity The particle's 'y' component of the velocity.
+     * @param mass     The particle's mass.
+     * @param radius   The particle's radius.
+     * @param position The particle's position.
+     * @param velocity The particle's radius.
      */
-    public Particle(double mass, double radius,
-                    double xPosition, double yPosition, double xVelocity, double yVelocity) {
+    public Particle(final double mass, final double radius, final Vector2D position, final Vector2D velocity) {
         this.mass = mass;
         this.radius = radius;
-        this.position = new Vector2D(xPosition, yPosition);
-        this.velocity = new Vector2D(xVelocity, yVelocity);
+        this.position = position;
+        this.velocity = velocity;
         this.collisionAmount = 0;
     }
 
@@ -103,20 +100,22 @@ public class Particle implements Collisionable, StateHolder<Particle.ParticleSta
      *
      * @param deltaTime The time variable of the linear motion equation.
      */
-    public void move(double deltaTime) {
+    public void move(final double deltaTime) {
         this.position = this.position.add(deltaTime, this.velocity);
     }
 
     /**
-     * Sets a new velocity for this particle.
+     * Sets a new velocity for the particle.
      *
-     * @param xVelocity The new 'x' component of the velocity.
-     * @param yVelocity The new 'y' component of the velocity.
+     * @param newVelocity The new velocity.
      */
-    public void setVelocity(double xVelocity, double yVelocity) {
-        this.velocity = new Vector2D(xVelocity, yVelocity);
+    public void setVelocity(final Vector2D newVelocity) {
+        this.velocity = newVelocity;
     }
 
+    /**
+     * Adds a collision to this particle.
+     */
     public void addCollision() {
         this.collisionAmount++;
     }
@@ -145,17 +144,16 @@ public class Particle implements Collisionable, StateHolder<Particle.ParticleSta
     }
 
     @Override
-    public void collide(Particle other) {
+    public void collide(final Particle other) {
         final Vector2D deltaR = getDeltaR(other);
         final Vector2D deltaV = getDeltaV(other);
         final double deltaVByDeltaR = deltaV.dotProduct(deltaR);
         final double sigma = getSigma(other);
         final double impulse = (2 * this.mass * other.mass * deltaVByDeltaR) / (sigma * (this.mass + other.mass));
-        final double xImpulse = (impulse * deltaR.getX()) / sigma;
-        final double yImpulse = (impulse * deltaR.getY()) / sigma;
+        final Vector2D impulseVector = deltaR.scalarMultiply(impulse / sigma);
 
-        this.setVelocity(this.velocity.getX() + xImpulse / this.mass, this.velocity.getY() + yImpulse / this.mass);
-        other.setVelocity(other.velocity.getX() - xImpulse / other.mass, other.velocity.getY() - yImpulse / other.mass);
+        this.setVelocity(this.velocity.add(impulseVector.scalarMultiply(1 / this.mass)));
+        other.setVelocity(other.velocity.subtract(impulseVector.scalarMultiply(1 / other.mass)));
         this.addCollision();
         other.addCollision();
     }
