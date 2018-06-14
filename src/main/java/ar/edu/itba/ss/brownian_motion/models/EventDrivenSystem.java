@@ -30,4 +30,10 @@ public interface EventDrivenSystem<S extends State> extends StateHolder<S> {
      * @return The {@link List} of {@link CollisionEvent}s that will happen in the future.
      */
     List<CollisionEvent<? extends Collisionable>> nextCollisions(final double now);
+
+    /**
+     * Reports to the implementer of this interface how many events have occurred in a time unit
+     * (i.e in a given output interval).
+     */
+    void reportAmountOfEvents(final int amountOfEvents);
 }

@@ -6,7 +6,10 @@ import ar.edu.itba.ss.brownian_motion.models.EventDrivenSystem;
 import ar.edu.itba.ss.g7.engine.simulation.State;
 import org.springframework.util.Assert;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.Optional;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 /**
  * An event driven simulation engine.
@@ -44,10 +47,6 @@ public class EventDrivenSimulationEngine<S extends State> {
      */
     private final double dt2;
 
-    private final Queue<CollisionEvent> processedEvents;
-
-    private final List<Integer> eventFrequencies;
-
     /**
      * Constructor.
      *
@@ -60,8 +59,6 @@ public class EventDrivenSimulationEngine<S extends State> {
         this.states = new LinkedList<>();
         this.events = new PriorityQueue<>();
         this.initialized = false;
-        this.eventFrequencies = new LinkedList<>();
-        this.processedEvents = new LinkedList<>();
     }
 
     /**
@@ -83,6 +80,7 @@ public class EventDrivenSimulationEngine<S extends State> {
         double outputInstant = startingInstant;
         double now = startingInstant;
         final double finishingInstant = startingInstant + duration;
+        int eventsByTimeUnit = 0; // This variable holds how many events had happened in a given output interval
         while (now < finishingInstant) {
             events.addAll(system.nextCollisions(now));
             final Optional<CollisionEvent<? extends Collisionable>> eventOptional = processEventsQueue();
@@ -90,6 +88,7 @@ public class EventDrivenSimulationEngine<S extends State> {
             // This should not happen, but just in case...
             Assert.state(eventOptional.isPresent(), "No more valid events before end of simulation");
 
+            // Here we know that there is a valid event to be processed
             final CollisionEvent<? extends Collisionable> event = eventOptional.get();
             final double eventInstant = event.getEventInstant();
             double nextOutputInstant = outputInstant + dt2;
@@ -98,16 +97,17 @@ public class EventDrivenSimulationEngine<S extends State> {
             while (nextOutputInstant < eventInstant) {
                 outputInstant = nextOutputInstant;
                 system.update(nextOutputInstant);
+                system.reportAmountOfEvents(eventsByTimeUnit);
                 saveState();
                 nextOutputInstant = nextOutputInstant + dt2;
+                eventsByTimeUnit = 0;
 
-                // TODO: move to another method
-                final int lastFrequency = eventFrequencies.stream().reduce(0, (o1, o2) -> o1 + o2);
-                eventFrequencies.add(this.processedEvents.size() - lastFrequency);
             }
+
+            // When reached here we know that the event is ready to be processed
+            eventsByTimeUnit++;
             system.update(eventInstant);
             event.executeEvent();
-            this.processedEvents.offer(event);
             now = eventInstant;
         }
     }
@@ -131,8 +131,6 @@ public class EventDrivenSimulationEngine<S extends State> {
         this.states.clear();
         this.events.clear();
         this.system.restart();
-        this.eventFrequencies.clear();
-        this.processedEvents.clear();
         saveState();
     }
 
@@ -172,6 +170,4 @@ public class EventDrivenSimulationEngine<S extends State> {
             throw new IllegalStateException("Engine not initialized. Must call #initialize method first!");
         }
     }
-
-
 }
