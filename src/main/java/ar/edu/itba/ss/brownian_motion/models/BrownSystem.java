@@ -55,6 +55,11 @@ public class BrownSystem implements EventDrivenSystem<BrownSystem.BrownSystemSta
      */
     private final ComponentsProvider componentsProvider;
 
+    /**
+     * Indicates whether this room is clean (i.e can be used to perform the simulation from the beginning).
+     */
+    private boolean clean;
+
 
     // ================================================================================================================
     // Constructor
@@ -83,6 +88,7 @@ public class BrownSystem implements EventDrivenSystem<BrownSystem.BrownSystemSta
         this.particles = holder.getParticles();
         this.bigParticle = holder.getBigParticle();
         this.lastUpdated = 0;
+        this.clean = true;
     }
 
 
@@ -92,6 +98,7 @@ public class BrownSystem implements EventDrivenSystem<BrownSystem.BrownSystemSta
 
     @Override
     public void update(final double instant) {
+        this.clean = false;
         if (Double.compare(instant, lastUpdated) <= 0) {
             return;
         }
@@ -101,11 +108,15 @@ public class BrownSystem implements EventDrivenSystem<BrownSystem.BrownSystemSta
 
     @Override
     public void restart() {
+        if (clean) {
+            return;
+        }
         this.particles.clear();
         final ComponentsProvider.ParticlesHolder holder = componentsProvider.createParticles();
         this.bigParticle = holder.getBigParticle();
         this.particles.addAll(holder.getParticles());
         this.lastUpdated = 0;
+        this.clean = true;
     }
 
     @Override
