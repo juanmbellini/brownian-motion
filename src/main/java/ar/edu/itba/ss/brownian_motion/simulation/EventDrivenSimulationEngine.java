@@ -6,10 +6,7 @@ import ar.edu.itba.ss.brownian_motion.models.EventDrivenSystem;
 import ar.edu.itba.ss.g7.engine.simulation.State;
 import org.springframework.util.Assert;
 
-import java.util.LinkedList;
-import java.util.Optional;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * An event driven simulation engine.
@@ -48,6 +45,12 @@ public class EventDrivenSimulationEngine<S extends State> {
     private final double dt2;
 
     /**
+     * A {@link List} containing the {@link CollisionEvent} that has been processed by this engine.
+     */
+    private final List<CollisionEvent<?>> processedEvents;
+
+
+    /**
      * Constructor.
      *
      * @param system The system to which the simulation will be performed.
@@ -58,6 +61,7 @@ public class EventDrivenSimulationEngine<S extends State> {
         this.dt2 = dt2;
         this.states = new LinkedList<>();
         this.events = new PriorityQueue<>();
+        this.processedEvents = new LinkedList<>();
         this.initialized = false;
     }
 
@@ -108,6 +112,7 @@ public class EventDrivenSimulationEngine<S extends State> {
             eventsByTimeUnit++;
             system.update(eventInstant);
             event.executeEvent();
+            saveProcessedEvent(event);
             now = eventInstant;
         }
     }
@@ -122,6 +127,15 @@ public class EventDrivenSimulationEngine<S extends State> {
     }
 
     /**
+     * Outputs a {@link List} of {@link CollisionEvent}s that have been processed by this engine.
+     *
+     * @return The {@link List} of {@link CollisionEvent}s that have been processed by this engine.
+     */
+    public List<CollisionEvent<?>> getProcessedEvents() {
+        return new LinkedList<>(processedEvents); // Copy queue to avoid change of state from outside.
+    }
+
+    /**
      * Clears this engine
      * (i.e removes all {@link State}s from the {@link Queue}).
      *
@@ -129,6 +143,7 @@ public class EventDrivenSimulationEngine<S extends State> {
      */
     public void clear() throws IllegalStateException {
         this.states.clear();
+        this.processedEvents.clear();
         this.events.clear();
         this.system.restart();
         saveState();
@@ -159,6 +174,14 @@ public class EventDrivenSimulationEngine<S extends State> {
         this.states.offer(this.system.outputState());
     }
 
+    /**
+     * Saves the given {@code event} in the {@link List} of processed events.
+     *
+     * @param event The {@link CollisionEvent} to be saved.
+     */
+    private void saveProcessedEvent(final CollisionEvent<?> event) {
+        this.processedEvents.add(event);
+    }
 
     /**
      * Validates the state of this engine.

@@ -19,7 +19,7 @@
 
         <!-- Dependencies versions  -->
         <org.springframework.boot.version>1.5.10.RELEASE</org.springframework.boot.version>
-        <com.github.juanmbellini.sim-engine.version>0.0.3-RELEASE</com.github.juanmbellini.sim-engine.version>
+        <com.github.juanmbellini.sim-engine.version>0.0.5-RELEASE</com.github.juanmbellini.sim-engine.version>
         <org.apache.commons.commons-math3.version>3.6.1</org.apache.commons.commons-math3.version>
 
 

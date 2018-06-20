@@ -49,6 +49,16 @@
       "name": "custom.output.ovito",
       "type": "java.lang.String",
       "description": "The path for the Ovito file."
+    },
+    {
+      "name": "custom.output.octave-time",
+      "type": "java.lang.String",
+      "description": "The path for the Octave time series file."
+    },
+    {
+      "name": "custom.output.octave-events",
+      "type": "java.lang.String",
+      "description": "The path for the Octave events file."
     }
   ]
 }

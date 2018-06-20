@@ -1,5 +1,7 @@
 package ar.edu.itba.ss.brownian_motion;
 
+import ar.edu.itba.ss.brownian_motion.io.OctaveFileEventsDataSaver;
+import ar.edu.itba.ss.brownian_motion.io.OctaveFileTimeSeriesDataSaver;
 import ar.edu.itba.ss.brownian_motion.io.OvitoFileSaverImpl;
 import ar.edu.itba.ss.brownian_motion.io.ProgramArguments;
 import ar.edu.itba.ss.brownian_motion.models.BrownSystem;
@@ -43,6 +45,16 @@ public class BrownMotion implements CommandLineRunner, InitializingBean {
     private final DataSaver<BrownSystem.BrownSystemState> ovitoFileSaver;
 
     /**
+     * The {@link DataSaver} that will output the Octave file that contains time series data.
+     */
+    private final DataSaver<BrownSystem.BrownSystemState> octaveFileTimeSeriesDataSaver;
+
+    /**
+     * An {@link OctaveFileEventsDataSaver} that will output events stuff.
+     */
+    private final OctaveFileEventsDataSaver octaveFileEventsDataSaver;
+
+    /**
      * Constructor.
      *
      * @param programArguments The program arguments.
@@ -56,6 +68,10 @@ public class BrownMotion implements CommandLineRunner, InitializingBean {
         this.engine = new EventDrivenSimulationEngine<>(brownSystem, programArguments.getOutputInterval());
         this.duration = programArguments.getDuration();
         this.ovitoFileSaver = new OvitoFileSaverImpl(programArguments.getOvitoFilePath());
+        this.octaveFileTimeSeriesDataSaver =
+                new OctaveFileTimeSeriesDataSaver(programArguments.getOctaveTimeSeriesFilePath(),
+                        duration, programArguments.getOutputInterval());
+        this.octaveFileEventsDataSaver = new OctaveFileEventsDataSaver(programArguments.getOctaveEventsFilePath());
     }
 
     @Override
@@ -89,6 +105,8 @@ public class BrownMotion implements CommandLineRunner, InitializingBean {
     private void save() {
         LOGGER.info("Saving outputs...");
         ovitoFileSaver.save(new LinkedList<>(this.engine.getStates()));
+        octaveFileTimeSeriesDataSaver.save(new LinkedList<>(this.engine.getStates()));
+        octaveFileEventsDataSaver.save(new LinkedList<>(this.engine.getProcessedEvents()));
         LOGGER.info("Finished saving output in all formats.");
     }
 

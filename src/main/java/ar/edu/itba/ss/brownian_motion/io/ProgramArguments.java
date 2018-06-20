@@ -56,17 +56,29 @@ public class ProgramArguments {
     private final String ovitoFilePath;
 
     /**
+     * Path to Octave's time series file.
+     */
+    private final String octaveTimeSeriesFilePath;
+
+    /**
+     * Path to Octave's events file.
+     */
+    private final String octaveEventsFilePath;
+
+    /**
      * Constructor.
      *
-     * @param wallLength             The wall's length.
-     * @param amountOfSmallParticles The amount of small particles.
-     * @param smallParticlesRadius   The small particles' radius.
-     * @param smallParticlesMass     The small particles' mass.
-     * @param bigParticlesRadius     The big particle's radius.
-     * @param bigParticlesMass       The big particle's mass.
-     * @param duration               The duration of the simulation.
-     * @param outputInterval         The output interval
-     * @param ovitoFilePath          Path to Ovito file.
+     * @param wallLength               The wall's length.
+     * @param amountOfSmallParticles   The amount of small particles.
+     * @param smallParticlesRadius     The small particles' radius.
+     * @param smallParticlesMass       The small particles' mass.
+     * @param bigParticlesRadius       The big particle's radius.
+     * @param bigParticlesMass         The big particle's mass.
+     * @param duration                 The duration of the simulation.
+     * @param outputInterval           The output interval
+     * @param ovitoFilePath            Path to Ovito file.
+     * @param octaveTimeSeriesFilePath Path to Octave's time series file.
+     * @param octaveEventsFilePath     Path to Octave's events file.
      */
     @Autowired
     public ProgramArguments(@Value("${custom.system.wall-length}") final double wallLength,
@@ -77,7 +89,9 @@ public class ProgramArguments {
                             @Value("${custom.system.big-particle-mass}") final double bigParticlesMass,
                             @Value("${custom.simulation.duration}") final double duration,
                             @Value("${custom.simulation.output-interval}") final double outputInterval,
-                            @Value("${custom.output.ovito}") final String ovitoFilePath) {
+                            @Value("${custom.output.ovito}") final String ovitoFilePath,
+                            @Value("${custom.output.octave-time}") final String octaveTimeSeriesFilePath,
+                            @Value("${custom.output.octave-events}") final String octaveEventsFilePath) {
 
         this.wallLength = wallLength;
         this.amountOfSmallParticles = amountOfSmallParticles;
@@ -88,6 +102,8 @@ public class ProgramArguments {
         this.duration = duration;
         this.outputInterval = outputInterval;
         this.ovitoFilePath = ovitoFilePath;
+        this.octaveTimeSeriesFilePath = octaveTimeSeriesFilePath;
+        this.octaveEventsFilePath = octaveEventsFilePath;
     }
 
     /**
@@ -151,5 +167,19 @@ public class ProgramArguments {
      */
     public String getOvitoFilePath() {
         return ovitoFilePath;
+    }
+
+    /**
+     * @return Path to Octave's time series file.
+     */
+    public String getOctaveTimeSeriesFilePath() {
+        return octaveTimeSeriesFilePath;
+    }
+
+    /**
+     * @return Path to Octave's events file.
+     */
+    public String getOctaveEventsFilePath() {
+        return octaveEventsFilePath;
     }
 }
