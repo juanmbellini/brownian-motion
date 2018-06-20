@@ -236,6 +236,9 @@ public class BrownSystem implements EventDrivenSystem<BrownSystem.BrownSystemSta
          */
         private final Particle.ParticleState bigParticleState;
 
+        /**
+         * The total amount of collisions that occurred in the last output interval.
+         */
         private final int lastAmountOfCollisionsReported;
 
 

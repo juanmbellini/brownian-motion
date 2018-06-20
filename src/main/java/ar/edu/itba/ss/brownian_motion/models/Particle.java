@@ -82,13 +82,6 @@ public class Particle implements Collisionable, StateHolder<Particle.ParticleSta
     }
 
     /**
-     * @return The particle's kinetic energy.
-     */
-    public double getKineticEnergy() {
-        return 0.5 * mass * velocity.getNormSq();
-    }
-
-    /**
      * @return The amount of collisions this particle has.
      */
     public int getCollisionsAmount() {

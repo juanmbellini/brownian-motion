@@ -67,6 +67,14 @@ public class OctaveFileTimeSeriesDataSaver extends TextFileSaver<BrownSystem.Bro
                         .collect(Collectors.joining(", ")))
                 .collect(Collectors.joining("; ")) + "];";
 
+        final String kineticEnergy = "kineticEnergy = [" + queue.stream()
+                .map(BrownSystem.BrownSystemState::getParticleStates)
+                .map(list -> list.stream()
+                        .map(p -> 0.5 * p.getMass() * p.getVelocity().getNormSq())
+                        .map(Object::toString)
+                        .collect(Collectors.joining(", ")))
+                .collect(Collectors.joining("; ")) + "];";
+
 
         // Append results into the Writer
         writer
@@ -81,6 +89,8 @@ public class OctaveFileTimeSeriesDataSaver extends TextFileSaver<BrownSystem.Bro
                 .append(bigParticleTrajectory)
                 .append("\n")
                 .append(velocitiesModules)
+                .append("\n")
+                .append(kineticEnergy)
                 .append("\n")
         ;
     }
