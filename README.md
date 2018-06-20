@@ -1,6 +1,6 @@
 # Brownian Motion [![Build Status](https://travis-ci.org/juanmbellini/brownian-motion.svg?branch=master)](https://travis-ci.org/juanmbellini/brownian-motion)
 
-Third System Simulations project: Browning Motion
+Third System Simulations project: Brownian Motion
 
 ## Getting started
 
