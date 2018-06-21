@@ -179,6 +179,10 @@ public class ComponentsProvider {
          */
         private final Particle bigParticle;
         /**
+         * A small {@link Particle}.
+         */
+        private final Particle smallParticle;
+        /**
          * The {@link List} of {@link Particle}s
          */
         private final List<Particle> particles;
@@ -192,6 +196,10 @@ public class ComponentsProvider {
         private ParticlesHolder(final Particle bigParticle, final List<Particle> particles) {
             this.bigParticle = bigParticle;
             this.particles = particles;
+            this.smallParticle = particles.stream()
+                    .filter(p -> p != bigParticle)
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("This should not happen"));
         }
 
         /**
@@ -206,6 +214,13 @@ public class ComponentsProvider {
          */
         public List<Particle> getParticles() {
             return particles;
+        }
+
+        /**
+         * @return A small {@link Particle}.
+         */
+        public Particle getSmallParticle() {
+            return smallParticle;
         }
     }
 }

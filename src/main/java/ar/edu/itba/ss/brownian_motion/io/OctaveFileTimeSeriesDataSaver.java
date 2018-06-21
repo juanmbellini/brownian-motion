@@ -51,8 +51,14 @@ public class OctaveFileTimeSeriesDataSaver extends TextFileSaver<BrownSystem.Bro
 
         // This is saved as a matrix, where each row represents a state,
         // the first column, the 'x' axis, and the second column, the 'y' axis.
-        final String bigParticleTrajectory = "bigParticleTrajectory = [" + queue.stream()
+        final String bigParticlePositions = "bigParticlePositions = [" + queue.stream()
                 .map(BrownSystem.BrownSystemState::getBigParticleState)
+                .map(Particle.ParticleState::getPosition)
+                .map(v -> v.getX() + ", " + v.getY())
+                .collect(Collectors.joining("; ")) + "];";
+
+        final String smallParticlePositions = "smallParticlePositions = [" + queue.stream()
+                .map(BrownSystem.BrownSystemState::getSmallParticleState)
                 .map(Particle.ParticleState::getPosition)
                 .map(v -> v.getX() + ", " + v.getY())
                 .collect(Collectors.joining("; ")) + "];";
@@ -86,7 +92,9 @@ public class OctaveFileTimeSeriesDataSaver extends TextFileSaver<BrownSystem.Bro
                 .append("\n")
                 .append(collisions)
                 .append("\n")
-                .append(bigParticleTrajectory)
+                .append(bigParticlePositions)
+                .append("\n")
+                .append(smallParticlePositions)
                 .append("\n")
                 .append(velocitiesModules)
                 .append("\n")

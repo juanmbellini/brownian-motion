@@ -35,6 +35,11 @@ public class BrownSystem implements EventDrivenSystem<BrownSystem.BrownSystemSta
      */
     private Particle bigParticle;
 
+    /**
+     * A small {@link Particle}.
+     */
+    private Particle smallParticle;
+
 
     // ================================================================================================================
     // Update stuff
@@ -87,11 +92,11 @@ public class BrownSystem implements EventDrivenSystem<BrownSystem.BrownSystemSta
 
         this.componentsProvider = new ComponentsProvider(length, bigParticleMass, bigParticleRadius,
                 smallParticlesMass, smallParticlesRadius, amountOfSmallParticles);
-
         this.walls = componentsProvider.buildRoom();
         final ComponentsProvider.ParticlesHolder holder = componentsProvider.createParticles();
         this.particles = holder.getParticles();
         this.bigParticle = holder.getBigParticle();
+        this.smallParticle = holder.getSmallParticle();
         this.lastAmountOfCollisionsReported = 0;
         this.lastUpdated = 0;
         this.clean = true;
@@ -117,10 +122,11 @@ public class BrownSystem implements EventDrivenSystem<BrownSystem.BrownSystemSta
         if (clean) {
             return;
         }
-        this.particles.clear();
         final ComponentsProvider.ParticlesHolder holder = componentsProvider.createParticles();
-        this.bigParticle = holder.getBigParticle();
+        this.particles.clear();
         this.particles.addAll(holder.getParticles());
+        this.bigParticle = holder.getBigParticle();
+        this.smallParticle = holder.getSmallParticle();
         this.lastAmountOfCollisionsReported = 0;
         this.lastUpdated = 0;
         this.clean = true;
@@ -181,6 +187,13 @@ public class BrownSystem implements EventDrivenSystem<BrownSystem.BrownSystemSta
     }
 
     /**
+     * @return A small {@link Particle}.
+     */
+    /* package */ Particle getSmallParticle() {
+        return smallParticle;
+    }
+
+    /**
      * @return The total amount of collisions that occurred in the last output interval.
      */
     /* package */ int getLastAmountOfCollisionsReported() {
@@ -237,6 +250,11 @@ public class BrownSystem implements EventDrivenSystem<BrownSystem.BrownSystemSta
         private final Particle.ParticleState bigParticleState;
 
         /**
+         * The small {@link Particle}'s state.
+         */
+        private final Particle.ParticleState smallParticleState;
+
+        /**
          * The total amount of collisions that occurred in the last output interval.
          */
         private final int lastAmountOfCollisionsReported;
@@ -255,6 +273,7 @@ public class BrownSystem implements EventDrivenSystem<BrownSystem.BrownSystemSta
                     .map(Wall::outputState)
                     .collect(Collectors.toList());
             this.bigParticleState = brownSystem.getBigParticle().outputState();
+            this.smallParticleState = brownSystem.getSmallParticle().outputState();
             this.lastAmountOfCollisionsReported = brownSystem.getLastAmountOfCollisionsReported();
         }
 
@@ -277,6 +296,13 @@ public class BrownSystem implements EventDrivenSystem<BrownSystem.BrownSystemSta
          */
         public Particle.ParticleState getBigParticleState() {
             return bigParticleState;
+        }
+
+        /**
+         * @return The small {@link Particle}'s state.
+         */
+        public Particle.ParticleState getSmallParticleState() {
+            return smallParticleState;
         }
 
         /**
